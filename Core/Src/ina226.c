@@ -1,125 +1,50 @@
 #include "ina226.h"
 
-float INA226_getBusV(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	return (INA226_getBusVReg(I2CHandler, DevAddress));
+HAL_StatusTypeDef INA226_getBusV(I2C_HandleTypeDef *I2CHandler, double *out) {
+    uint8_t setBusVoltageReg[1] = {INA226_BUSV};
+    HAL_StatusTypeDef transmit = HAL_I2C_Master_Transmit(I2CHandler, INA226_ADDRESS, setBusVoltageReg, 1, INA226_I2CTIMEOUT);
+    if(transmit != HAL_OK){
+       return transmit;
+    }
+
+    uint8_t receiveBusVoltage[2] = {0, 0};
+    HAL_StatusTypeDef receive = HAL_I2C_Master_Receive(I2CHandler, INA226_ADDRESS, receiveBusVoltage, 2, INA226_I2CTIMEOUT);
+    if (receive != HAL_OK){
+        return receive;
+    }
+
+    uint16_t x = receiveBusVoltage[0];
+    x <<= 8;
+    x |= receiveBusVoltage[1];
+    *out = x * INA_226_MIN_BUS_VOLTAGE;
+    return HAL_OK;
 }
 
-float INA226_getCurrent(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	return (INA226_getCurrentReg(I2CHandler, DevAddress)*INA226_CURRENTLSB_INV);
+HAL_StatusTypeDef setConfig(I2C_HandleTypeDef *I2CHandler, uint8_t config) {
+    uint8_t setConfigReg[1] = {INA226_CONFIG};
+    HAL_StatusTypeDef transmit = HAL_I2C_Master_Transmit(I2CHandler, INA226_ADDRESS, setConfigReg, 1, INA226_I2CTIMEOUT);
+    if(transmit != HAL_OK){
+        return transmit;
+    }
+    uint8_t configValues[2] = {0, 0};
+    HAL_StatusTypeDef receive = HAL_I2C_Master_Receive(I2CHandler, INA226_ADDRESS, configValues, 2, INA226_I2CTIMEOUT);
+    if (receive != HAL_OK){
+        return receive;
+    }
+    configValues[1] = (configValues[1] & ~INA226_CONFIG_MASK) | config; // 7 is the last three bits
+    uint8_t newConfigReg[3] = {INA226_CONFIG, configValues[0], configValues[1]};
+    transmit = HAL_I2C_Master_Transmit(I2CHandler, INA226_ADDRESS, newConfigReg, 3, INA226_I2CTIMEOUT);
+    if(transmit != HAL_OK){
+        return transmit;
+    }
+    return HAL_OK;
+
 }
 
-float INA226_getPower(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	return (INA226_getPowerReg(I2CHandler, DevAddress)*INA226_POWERLSB_INV);
+HAL_StatusTypeDef INA226_standBy(I2C_HandleTypeDef *I2CHandler) {
+    return setConfig(I2CHandler, INA226_MODE_POWER_DOWN);
 }
 
-uint8_t INA226_setConfig(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress, uint16_t ConfigWord) {
-	uint8_t SentTable[3];
-	SentTable[0] = INA226_CONFIG;
-	SentTable[1] = (ConfigWord & 0xFF00) >> 8;
-	SentTable[2] = (ConfigWord & 0x00FF);
-	return HAL_I2C_Master_Transmit(I2CHandler, DevAddress, SentTable, 3, INA226_I2CTIMEOUT);
-}
-
-uint16_t INA226_getConfig(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_CONFIG};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getShuntV(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_SHUNTV};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getBusVReg(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_BUSV};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint8_t INA226_setCalibrationReg(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress, uint16_t ConfigWord) {
-	uint8_t SentTable[3];
-	SentTable[0] = INA226_CALIB;
-	SentTable[1] = (ConfigWord & 0xFF00) >> 8;
-	SentTable[2] = (ConfigWord & 0x00FF);
-	return HAL_I2C_Master_Transmit(I2CHandler, DevAddress, SentTable, 3, INA226_I2CTIMEOUT);
-}
-
-uint16_t INA226_getCalibrationReg(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_CALIB};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getPowerReg(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_POWER};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getCurrentReg(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_CURRENT};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getManufID(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_MANUF_ID};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint16_t INA226_getDieID(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_DIE_ID};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint8_t INA226_setMaskEnable(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress, uint16_t ConfigWord) {
-	uint8_t SentTable[3];
-	SentTable[0] = INA226_MASK;
-	SentTable[1] = (ConfigWord & 0xFF00) >> 8;
-	SentTable[2] = (ConfigWord & 0x00FF);
-	return HAL_I2C_Master_Transmit(I2CHandler, DevAddress, SentTable, 3, INA226_I2CTIMEOUT);
-}
-
-uint16_t INA226_getMaskEnable(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_MASK};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
-}
-
-uint8_t INA226_setAlertLimit(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress, uint16_t ConfigWord) {
-	uint8_t SentTable[3];
-	SentTable[0] = INA226_ALERTL;
-	SentTable[1] = (ConfigWord & 0xFF00) >> 8;
-	SentTable[2] = (ConfigWord & 0x00FF);
-	return HAL_I2C_Master_Transmit(I2CHandler, DevAddress, SentTable, 3, INA226_I2CTIMEOUT);
-}
-
-uint16_t INA226_getAlertLimit(I2C_HandleTypeDef *I2CHandler, uint16_t DevAddress) {
-	uint8_t SentTable[1] = {INA226_ALERTL};
-	uint8_t ReceivedTable[2];
-	HAL_I2C_Master_Transmit(I2CHandler,DevAddress, SentTable, 1, INA226_I2CTIMEOUT);
-	if (HAL_I2C_Master_Receive(I2CHandler,DevAddress, ReceivedTable, 2, INA226_I2CTIMEOUT) != HAL_OK) return 0xFF;
-	else return ((uint16_t)ReceivedTable[0]<<8 | ReceivedTable[1]);
+HAL_StatusTypeDef INA226_wakeUpAndSmellTheVoltage(I2C_HandleTypeDef *I2CHandler) {
+    return setConfig(I2CHandler, INA226_MODE_TRIG_BUS_VOLTAGE);
 }

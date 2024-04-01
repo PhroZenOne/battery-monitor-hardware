@@ -41,13 +41,36 @@ CMakeFiles/blink.elf.dir/Core/Src/ina226.c.obj: C:/Users/PhroZen/STM32CubeIDE/wo
   C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h
 
 CMakeFiles/blink.elf.dir/Core/Src/main.c.obj: C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/main.c \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/_ansi.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/_newlib_version.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_default_types.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_endian.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_types.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/endian.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/ieeefp.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/time.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/types.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/newlib.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdint.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_intsup.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_locale.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_pthreadtypes.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_sigset.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_stdint.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_timespec.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_timeval.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_types.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/cdefs.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/config.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/features.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/lock.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/reent.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/sched.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/select.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/stat.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/timespec.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/types.h \
+  C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/time.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/lib/gcc/arm-none-eabi/13.2.1/include/stddef.h \
   C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/lib/gcc/arm-none-eabi/13.2.1/include/stdint.h \
   C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Inc/ina226.h \
@@ -953,27 +976,31 @@ CMakeFiles/blink.elf.dir/Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_tim_ex.c
   C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h
 
 
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_types.h:
+
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/ina226.c:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_cortex.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/features.h:
 
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/time.h:
+
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/_newlib_version.h:
 
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/select.h:
+
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/lib/gcc/arm-none-eabi/13.2.1/include/stddef.h:
-
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/syscalls.c:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdint.h:
-
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Inc/stm32l0xx_it.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_cortex.c:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rcc.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_i2c.h:
+
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Inc/stm32l0xx_it.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdint.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_default_types.h:
 
@@ -1011,21 +1038,23 @@ C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Drive
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/CMSIS/Include/cmsis_version.h:
 
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/stm32l0xx_it.c:
-
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/CMSIS/Include/mpu_armv7.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal.h:
 
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_i2c.c:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/lock.h:
+
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_def.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdlib.h:
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_dma.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/stat.h:
 
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_dma.h:
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/reent.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_endian.h:
 
@@ -1038,8 +1067,6 @@ C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ex.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_flash_ramfunc.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdio.h:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_gpio_ex.h:
 
@@ -1057,27 +1084,13 @@ C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/main.c:
 
 C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Inc/stm32l0xx_hal_rtc_ex.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_timeval.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/cdefs.h:
-
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Inc/main.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/stdlib.h:
-
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/stm32l0xx_hal_msp.c:
-
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/_ansi.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_time.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/alloca.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/errno.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_pthreadtypes.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_types.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/types.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/endian.h:
 
@@ -1085,39 +1098,49 @@ C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/newlib.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/signal.h:
-
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_timespec.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_locale.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_types.h:
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/_timeval.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/cdefs.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/config.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/errno.h:
-
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Drivers/STM32L0xx_HAL_Driver/Src/stm32l0xx_hal_i2c.c:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/lock.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/reent.h:
-
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/sched.h:
 
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/select.h:
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/timespec.h:
+
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Inc/main.h:
+
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/stm32l0xx_hal_msp.c:
+
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/stm32l0xx_it.c:
+
+C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/Core/Src/syscalls.c:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/alloca.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/errno.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/_time.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/machine/stdlib.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/signal.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdio.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/stdlib.h:
+
+C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/errno.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/signal.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/stdio.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/times.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/timespec.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/sys/types.h:
-
-C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/arm-none-eabi/include/time.h:
 
 C:/Program\ Files\ (x86)/Arm\ GNU\ Toolchain\ arm-none-eabi/13.2\ Rel1/lib/gcc/arm-none-eabi/13.2.1/include/stdarg.h:
 

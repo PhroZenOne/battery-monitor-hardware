@@ -59,6 +59,7 @@ static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
 
 static void MX_I2C3_Init(void);
+
 /* USER CODE BEGIN PFP */
 
 _Noreturn void Shutdown();
@@ -133,23 +134,45 @@ int main(void) {
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
-        HAL_Delay(500);
-        uint8_t buf[3] = {0x02, 0, 0};
-        if(HAL_I2C_Master_Transmit(&hi2c3, 0x40 << 1, buf, 3, 1000)){
-            Error_Handler();
+        // Just a wakeup blink
+        for (int i = 75; i > 0; i--) {
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            float v = (float) i / 75.0f;
+            float delay = v * v * v * 75.0f;
+            HAL_Delay((int) delay);
         }
 
-        // Wait
+        INA226_wakeUpAndSmellTheVoltage(&hi2c3);
+
+        HAL_GPIO_WritePin(HIGH_POWER_GPIO_Port, HIGH_POWER_Pin, 0);
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
+
         HAL_Delay(1000);
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+
+        // fetch the voltage
+        double voltage;
+        if (INA226_getBusV(&hi2c3, &voltage) != HAL_OK) {
+            Error_Handler();
+        }
+        INA226_standBy(&hi2c3);
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
-        //Shutdown();
+        HAL_Delay(6000);
+        // Shutdown blink
+
+
+        // Shutdown blink
+        for (int i = 0; i < 75; i++) {
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            float v = (float) i / 75.0f;
+            float delay = v * v * v * 75.0f;
+            HAL_Delay((int) delay);
+        }
+        Shutdown();
     }
     /* USER CODE END 3 */
 }
-
 
 
 /**
