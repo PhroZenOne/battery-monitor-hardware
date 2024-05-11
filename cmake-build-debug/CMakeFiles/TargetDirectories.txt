@@ -1,3 +1,0 @@
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/cmake-build-debug/CMakeFiles/blink.elf.dir
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/PhroZen/STM32CubeIDE/workspace_1.13.2/blink/cmake-build-debug/CMakeFiles/rebuild_cache.dir

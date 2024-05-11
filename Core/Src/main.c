@@ -1,6 +1,3 @@
-#include <sys/cdefs.h>
-#include <sys/stat.h>
-#include <sys/cdefs.h>
 /* USER CODE BEGIN Header */
 /**
  ******************************************************************************
@@ -25,6 +22,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "ina226.h"
+
+#include <stdbool.h>
+#include <string.h>
+
+#define BUFF_SIZE 256
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +50,18 @@ I2C_HandleTypeDef hi2c3;
 
 RTC_HandleTypeDef hrtc;
 
+UART_HandleTypeDef huart2;
+
 /* USER CODE BEGIN PV */
+
+unsigned char rxBuff1[BUFF_SIZE];
+unsigned char rxBuff2[BUFF_SIZE];
+unsigned char lastMessage[BUFF_SIZE];
+bool useBuff1 = true;
+unsigned char rxBuffReceived[BUFF_SIZE];
+bool waitingForReceiving = false;
+volatile unsigned int receivingSize = sizeof(rxBuffReceived);
+const char *newline = "\r\n";
 
 /* USER CODE END PV */
 
@@ -60,36 +74,227 @@ static void MX_RTC_Init(void);
 
 static void MX_I2C3_Init(void);
 
-/* USER CODE BEGIN PFP */
+static void MX_USART2_UART_Init(void);
 
-_Noreturn void Shutdown();
+/* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-_Noreturn void Shutdown() {
-    /* Select Standby mode */
-    SET_BIT(PWR->CR, PWR_CR_PDDS);
 
-    /* Set SLEEPDEEP bit of Cortex System Control Register */
-    SET_BIT(SCB->SCR, SCB_SCR_SLEEPDEEP_Msk);
-
-    /* This option is used to ensure that store operations are completed */
-#if defined ( __CC_ARM)
-    __force_stores();
-#endif
-
-    // Enter low-power mode
-    for (;;) {
-        __DSB();
-        __WFI();
+void RampBlink(bool reverse) {
+    if (reverse) {
+        for (int i = 0; i < 75; i++) {
+            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+            float v = (float) i / 75.0f;
+            float delay = v * v * v * 75.0f;
+            HAL_Delay((int) delay);
+        }
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        return;
     }
+    for (int i = 75; i > 0; i--) {
+        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+        float v = (float) i / 75.0f;
+        float delay = v * v * v * 75.0f;
+        HAL_Delay((int) delay);
+    }
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+}
+
+//_Noreturn void Shutdown() {
+//    // Shutdown blink
+//    RampBlink(true);
+//
+//    /* Select Standby mode */
+//    SET_BIT(PWR->CR, PWR_CR_PDDS);
+//
+//    /* Set SLEEPDEEP bit of Cortex System Control Register */
+//    SET_BIT(SCB->SCR, SCB_SCR_SLEEPDEEP_Msk);
+//
+//    /* This option is used to ensure that store operations are completed */
+//#if defined ( __CC_ARM)
+//    __force_stores();
+//#endif
+//
+//    // Enter low-power mode
+//    for (;;) {
+//        __DSB();
+//        __WFI();
+//    }
+//}
+
+void enableHighPower() {
+    HAL_GPIO_WritePin(HIGH_POWER_SINK_GPIO_Port, HIGH_POWER_SINK_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(HIGH_POWER_GPIO_Port, HIGH_POWER_Pin, GPIO_PIN_RESET);
+}
+
+void disableHighPower() {
+    HAL_GPIO_WritePin(HIGH_POWER_SINK_GPIO_Port, HIGH_POWER_SINK_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(HIGH_POWER_GPIO_Port, HIGH_POWER_Pin, GPIO_PIN_SET);
+}
+
+void HAL_UARTEx_RxEventCallback(__attribute__((unused)) UART_HandleTypeDef *huart, uint16_t size) {
+    if (!waitingForReceiving) {
+        return;
+    }
+    unsigned char *buffer = useBuff1 ? rxBuff1 : rxBuff2;
+    memcpy(&buffer, rxBuffReceived, size);
+    buffer[size] = '\0';
+    waitingForReceiving = false;
+    useBuff1 = !useBuff1;
+}
+
+
+bool send(const char *toSend) {
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, rxBuffReceived, receivingSize);
+    waitingForReceiving = true;
+
+    char sendBuff[BUFF_SIZE];
+    strcat(sendBuff, toSend);
+    strcat(sendBuff, newline);
+    HAL_StatusTypeDef status = HAL_UART_Transmit(&huart2,
+                                                 (uint8_t *) sendBuff,
+                                                 strlen(sendBuff) - 1, // -1 to remove null terminator
+                                                 150);
+    if (status != HAL_OK) {
+        Error_Handler();
+    }
+
+    int i = 0;
+    while (waitingForReceiving && i < 100) {
+        HAL_Delay(100);
+        i++;
+    }
+    if (waitingForReceiving) {
+        // Timeout
+        return false;
+    }
+    unsigned char *backBuffer = useBuff1 ? rxBuff2 : rxBuff1;
+    memcpy(lastMessage, backBuffer, strlen((char *) backBuffer));
+
+    if (strstr((char *) backBuffer, "OK\r\n")) {
+        return true;
+    }
+    return false;
+}
+
+
+void sendData(double voltage) {
+
+    HAL_GPIO_WritePin(SIM_POWERKEY_GPIO_Port, SIM_POWERKEY_Pin, GPIO_PIN_SET);
+    HAL_Delay(500);
+    HAL_GPIO_WritePin(SIM_POWERKEY_GPIO_Port, SIM_POWERKEY_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(SIM_DTR_GPIO_Port, SIM_DTR_Pin, GPIO_PIN_RESET);
+    HAL_Delay(600);
+
+    // Send OK until we are getting OK back
+    const char at[] = "\r\n";
+
+    int retries = 10;
+    bool ok = false;
+    while (!ok && retries > 0) {
+        ok = send("AT");
+        retries--;
+    }
+
+    if (retries == 0) {
+        Error_Handler();
+    }
+
+    // Disable echo
+    if (!send("ATE0")) {
+        Error_Handler();
+    }
+
+    // Set error handling on
+    if (!send("AT+CMEE=2")) {
+        Error_Handler();
+    }
+
+    retries = 10;
+    while (!strstr((char *) lastMessage, "+CPIN: READY") && retries > 0) {
+        if (!send("AT+CPIN?")) {
+            Error_Handler();
+        }
+        retries--;
+    }
+
+    if (retries == 0) {
+        Error_Handler();
+    }
+
+    if (!send("AT+CNMP=13")) {
+        Error_Handler();
+    }
+
+    if (!send("AT+CMNB=2")) {
+        Error_Handler();
+    }
+
+    retries = 10;
+    while (!strstr((char *) lastMessage, "+CGREG: 0,1") && retries > 0) {
+        if (!send("AT+CGREG?")) {
+            Error_Handler();
+        }
+        retries--;
+    }
+
+    if (!send("AT+CGDCONT=1,\"IP\",\"internet.tele2.se\"")) {
+        Error_Handler();
+    }
+
+    if (!send("AT+CNCFG=0,1,\"internet.tele2.se\"")) {
+        Error_Handler();
+    }
+
+    if (!send("AT+CNACT=0,1")) {
+        Error_Handler();
+    }
+
+
+
+//    enum RegStatus {
+//        REG_NO_RESULT    = -1,
+//        REG_UNREGISTERED = 0,
+//        REG_SEARCHING    = 2,
+//        REG_DENIED       = 3,
+//        REG_OK_HOME      = 1,
+//        REG_OK_ROAMING   = 5,
+//        REG_UNKNOWN      = 4,
+//    };
+
+//    RegStatus getRegistrationStatus() {
+//        RegStatus epsStatus =
+//                (RegStatus)thisModem().getRegistrationStatusXREG("CEREG");
+//        // If we're connected on EPS, great!
+//        if (epsStatus == REG_OK_HOME || epsStatus == REG_OK_ROAMING) {
+//            return epsStatus;
+//        } else {
+//            // Otherwise, check GPRS network status
+//            // We could be using GPRS fall-back or the board could be being moody
+//            return (RegStatus)thisModem().getRegistrationStatusXREG("CGREG");
+//        }
+//    }
+
+//    int8_t getRegistrationStatusXREG(const char* regCommand) {
+//        thisModem().sendAT('+', regCommand, '?');
+//        // check for any of the three for simplicity
+//        int8_t resp = thisModem().waitResponse(GF("+CREG:"), GF("+CGREG:"),
+//                                               GF("+CEREG:"));
+//        if (resp != 1 && resp != 2 && resp != 3) { return -1; }
+//        thisModem().streamSkipUntil(','); /* Skip format (0) */
+//        int status = thisModem().stream.parseInt();
+//        thisModem().waitResponse();
+//        return status;
+//    }
+
+
 }
 
 /* USER CODE END 0 */
-
 /**
   * @brief  The application entry point.
   * @retval int
@@ -120,6 +325,7 @@ int main(void) {
     MX_GPIO_Init();
     MX_RTC_Init();
     MX_I2C3_Init();
+    MX_USART2_UART_Init();
     /* USER CODE BEGIN 2 */
     /* Check and handle if the system was resumed from StandBy mode */
     if (__HAL_PWR_GET_FLAG(PWR_FLAG_SB) != RESET) {
@@ -134,19 +340,9 @@ int main(void) {
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
-        // Just a wakeup blink
-        for (int i = 75; i > 0; i--) {
-            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-            float v = (float) i / 75.0f;
-            float delay = v * v * v * 75.0f;
-            HAL_Delay((int) delay);
-        }
+        RampBlink(false);
 
         INA226_wakeUpAndSmellTheVoltage(&hi2c3);
-
-        HAL_GPIO_WritePin(HIGH_POWER_GPIO_Port, HIGH_POWER_Pin, 0);
-        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, 0);
-
         HAL_Delay(1000);
 
         // fetch the voltage
@@ -155,25 +351,20 @@ int main(void) {
             Error_Handler();
         }
         INA226_standBy(&hi2c3);
+        enableHighPower();
+
+        sendData(voltage);
+
+        disableHighPower();
+
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
         HAL_Delay(6000);
-        // Shutdown blink
-
-
-        // Shutdown blink
-        for (int i = 0; i < 75; i++) {
-            HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-            float v = (float) i / 75.0f;
-            float delay = v * v * v * 75.0f;
-            HAL_Delay((int) delay);
-        }
-        Shutdown();
+        //Shutdown();
     }
     /* USER CODE END 3 */
 }
-
 
 /**
   * @brief System Clock Configuration
@@ -213,7 +404,9 @@ void SystemClock_Config(void) {
     if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
         Error_Handler();
     }
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_I2C3 | RCC_PERIPHCLK_RTC;
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2 | RCC_PERIPHCLK_I2C3
+                                         | RCC_PERIPHCLK_RTC;
+    PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
     PeriphClkInit.I2c3ClockSelection = RCC_I2C3CLKSOURCE_PCLK1;
     PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
@@ -306,6 +499,40 @@ static void MX_RTC_Init(void) {
 }
 
 /**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void) {
+
+    /* USER CODE BEGIN USART2_Init 0 */
+
+    /* USER CODE END USART2_Init 0 */
+
+    /* USER CODE BEGIN USART2_Init 1 */
+
+    /* USER CODE END USART2_Init 1 */
+    huart2.Instance = USART2;
+    huart2.Init.BaudRate = 115200;
+    huart2.Init.WordLength = UART_WORDLENGTH_8B;
+    huart2.Init.StopBits = UART_STOPBITS_1;
+    huart2.Init.Parity = UART_PARITY_NONE;
+    huart2.Init.Mode = UART_MODE_TX_RX;
+    huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+    huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+    huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+    huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_SWAP_INIT;
+    huart2.AdvancedInit.Swap = UART_ADVFEATURE_SWAP_ENABLE;
+    if (HAL_UART_Init(&huart2) != HAL_OK) {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN USART2_Init 2 */
+
+    /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -323,14 +550,17 @@ static void MX_GPIO_Init(void) {
     __HAL_RCC_GPIOD_CLK_ENABLE();
 
     /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(GPIOC, HIGH_POWER_Pin | LED_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, HIGH_POWER_SINK_Pin | HIGH_POWER_Pin | LED_Pin, GPIO_PIN_SET);
 
-    /*Configure GPIO pins : PC13 PC14 PC15 PC2
-                             PC4 PC5 PC6 PC7
-                             PC8 PC10 PC11 PC12 */
-    GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15 | GPIO_PIN_2
-                          | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
-                          | GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOC, SIM_POWERKEY_Pin | SIM_DTR_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pins : PC13 PC14 PC15 PC4
+                             PC5 PC6 PC10 PC11
+                             PC12 */
+    GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15 | GPIO_PIN_4
+                          | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_10 | GPIO_PIN_11
+                          | GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -341,21 +571,19 @@ static void MX_GPIO_Init(void) {
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
-    /*Configure GPIO pin : HIGH_POWER_Pin */
-    GPIO_InitStruct.Pin = HIGH_POWER_Pin;
+    /*Configure GPIO pins : HIGH_POWER_SINK_Pin HIGH_POWER_Pin */
+    GPIO_InitStruct.Pin = HIGH_POWER_SINK_Pin | HIGH_POWER_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(HIGH_POWER_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    /*Configure GPIO pins : PA0 PA1 PA2 PA3
-                             PA4 PA5 PA6 PA7
-                             PA8 PA9 PA10 PA11
-                             PA12 PA15 */
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3
-                          | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
-                          | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11
-                          | GPIO_PIN_12 | GPIO_PIN_15;
+    /*Configure GPIO pins : PA0 PA1 PA4 PA5
+                             PA6 PA7 PA8 PA9
+                             PA10 PA11 PA12 PA15 */
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5
+                          | GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9
+                          | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_15;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -371,6 +599,13 @@ static void MX_GPIO_Init(void) {
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : SIM_POWERKEY_Pin SIM_DTR_Pin */
+    GPIO_InitStruct.Pin = SIM_POWERKEY_Pin | SIM_DTR_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     /*Configure GPIO pin : LED_Pin */
     GPIO_InitStruct.Pin = LED_Pin;

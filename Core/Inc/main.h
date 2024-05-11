@@ -1,4 +1,3 @@
-#include <sys/cdefs.h>
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
@@ -58,8 +57,14 @@ _Noreturn void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define HIGH_POWER_SINK_Pin GPIO_PIN_2
+#define HIGH_POWER_SINK_GPIO_Port GPIOC
 #define HIGH_POWER_Pin GPIO_PIN_3
 #define HIGH_POWER_GPIO_Port GPIOC
+#define SIM_POWERKEY_Pin GPIO_PIN_7
+#define SIM_POWERKEY_GPIO_Port GPIOC
+#define SIM_DTR_Pin GPIO_PIN_8
+#define SIM_DTR_GPIO_Port GPIOC
 #define LED_Pin GPIO_PIN_9
 #define LED_GPIO_Port GPIOC
 
